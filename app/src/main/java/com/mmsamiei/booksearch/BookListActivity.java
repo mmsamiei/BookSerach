@@ -1,8 +1,11 @@
 package com.mmsamiei.booksearch;
 
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -27,6 +30,25 @@ public class BookListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_book_list,menu);
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                fetchBooks(query);
+                searchView.clearFocus();
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+                searchItem.collapseActionView();
+                BookListActivity.this.setTitle(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
         return true;
     }
 
@@ -38,11 +60,10 @@ public class BookListActivity extends AppCompatActivity {
         ArrayList<Book> aBooks = new ArrayList<Book>();
         bookAdapter= new BookAdapter(this,aBooks);
         lvBooks.setAdapter(bookAdapter);
-        fetchBooks();
     }
-    private void fetchBooks(){
+    private void fetchBooks(String s){
         client = new BookClient();
-       client.getBooks("oscar",new JsonHttpResponseHandler(){
+       client.getBooks(s,new JsonHttpResponseHandler(){
            @Override
            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                try {
