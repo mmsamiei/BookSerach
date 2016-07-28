@@ -20,7 +20,7 @@ public class BookListActivity extends AppCompatActivity {
 
     private BookClient client;
 
-
+    //
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
