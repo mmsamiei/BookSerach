@@ -1,13 +1,17 @@
 package com.mmsamiei.booksearch;
 
+import android.graphics.Color;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -18,11 +22,11 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class BookListActivity extends AppCompatActivity {
+public class BookListActivity extends AppCompatActivity  {
     private ListView lvBooks;
     private BookAdapter bookAdapter;
-
     private BookClient client;
+    private CircularProgressView progressView;
 
     //
 
@@ -54,20 +58,27 @@ public class BookListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
         lvBooks = (ListView) findViewById(R.id.lvBooks);
         ArrayList<Book> aBooks = new ArrayList<Book>();
         bookAdapter= new BookAdapter(this,aBooks);
         lvBooks.setAdapter(bookAdapter);
+        progressView = (CircularProgressView) findViewById(R.id.progress_view);
+        progressView.setVisibility(CircularProgressView.GONE);
     }
     private void fetchBooks(String s){
+        progressView.setVisibility(CircularProgressView.VISIBLE);
+        progressView.startAnimation();
         client = new BookClient();
-       client.getBooks(s,new JsonHttpResponseHandler(){
+        client.getBooks(s,new JsonHttpResponseHandler(){
            @Override
            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                try {
-                    JSONArray docs=null;
+                   progressView.setVisibility(CircularProgressView.GONE);
+                   progressView.stopAnimation();
+                   JSONArray docs=null;
                    if(response!=null){
                        docs=response.getJSONArray("docs");
                        final ArrayList<Book> books = Book.fromJson(docs);
@@ -82,7 +93,14 @@ public class BookListActivity extends AppCompatActivity {
                    e.printStackTrace();
                }
            }
+
+           @Override
+           public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+               progressView.setVisibility(CircularProgressView.GONE);
+           }
        });
 
     }
+
+
 }

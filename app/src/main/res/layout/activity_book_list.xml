@@ -5,6 +5,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".BookListActivity">
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/progress_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        app:cpv_animAutostart="true"
+        app:cpv_indeterminate="true"
+        app:cpv_animDuration="5000"/>
     <ListView
         android:id="@+id/lvBooks"
         android:layout_width="match_parent"
